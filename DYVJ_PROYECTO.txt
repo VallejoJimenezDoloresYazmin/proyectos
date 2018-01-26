@@ -1,0 +1,141 @@
+﻿//VALLEJO JIMENEZ DOLORES YAZMÍN
+//PROYECTO FINAL
+//CAJA REGISTRADORA
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+typedef struct Especification_
+{
+	unsigned char nameP[50];
+	float precio;
+	int cantidad;
+
+}ESPECIFICACION;
+
+//Declaracion de la funcion
+int Bienvenida(ESPECIFICACION *P, int n);
+//cb[] es un arreglo de tipo entero
+void Imprimir(ESPECIFICACION *P, int n, float suma, int cb[]);
+
+int main()
+{
+	ESPECIFICACION *producto;
+	int numElementos = 30, choice = 0, CV = 0, n = 0, ok;
+	float suma = 0, total = 0;
+	int i, j;
+	unsigned char salir = 0;
+
+	char *p[31] = {"avena", "bombon", "cacahuate", "camaron", "chocolate", "chocomilk", "coca", "cebolla", "cereza",
+							"danonino", "dentrifico", "dulce", "fresa", "farmaco", "galleta", "helado", "jabon", "jamon",
+							"limon", "langosta", "lechuga", "mango", "nieve", "opio", "peluche", "rosa", "tostada", "uva",
+							"whiskey", "yakult"};
+	float price[] = {5.5, 3.0, 7.5, 180.0, 13.0, 25.5, 10.0, 3.5, 19.5, 28.5, 39.9, 18.5, 20.0, 150.0, 30.5, 90.0,
+						47.0, 35.0, 17.5, 280.0, 5.0, 18.5, 90.0, 550.0, 100.00, 18.5, 20.5, 45.5, 435.5, 30.0};
+	int ca[] = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10};
+
+	//Sirve para reservar memoria dinámica para el puntero producto.
+	producto = (ESPECIFICACION*)malloc(numElementos*sizeof(ESPECIFICACION));
+
+	//Asignamos los valores predeterminados de los productos de la tienda.
+	for( i = 0; i < numElementos; i++)
+	{
+		//producto[i].nameP = p[i];
+		strcpy(producto[i].nameP, p[i]);
+		producto[i].precio = price[i];
+		producto[i].cantidad = 10;
+	}
+	//while(salir != 'n')
+	do
+	{
+		while(choice != 30)
+		{
+		    //Choice recibe el resultudo retornado de la funcion bienvenida
+			choice = Bienvenida(producto, numElementos);
+			if(choice != 30)
+			{
+				producto[choice].cantidad -= 1;
+				suma += producto[choice].precio;
+			}
+		}
+			//
+		Imprimir(producto, numElementos, suma, ca);
+
+		do
+			{ //NOS DA EL CORTE TOTAL DE TODO EL DIA
+				printf("Deseas continuar trabajando despues de este corte: si(1)/no(2)\n");
+				ok = scanf("%d%*c", &n);
+			} while (!ok);
+
+		total += suma;
+
+		if(n == 1)
+		{
+			choice = 0;
+			suma = 0;
+		}
+		else
+		{
+			printf("Nombre     \tCantidad \tVendido\n");
+			for( j = 0; j < numElementos; j++)
+				{
+					CV = 10 - producto[j].cantidad;
+					if(CV >= 1)
+						printf("%s     \t%d \t\t%2.2f\n", producto[j].nameP, CV, producto[j].precio*CV);
+				}
+			printf("TotalFinal = %f\n", total);
+		}
+	}while(n != 2);
+
+	return 0;
+}
+
+//Para imprimir el ticket
+void Imprimir(ESPECIFICACION *P, int n, float suma, int cb[])
+{
+	int CV = 0, j;
+
+	printf("Nombre     \tCantidad \tVendido\n");
+	for( j = 0; j < n; j++)
+		{
+			CV = cb[j] - P[j].cantidad;
+			if(CV >= 1)
+			{
+				printf("%s     \t%d \t\t%2.2f\n", P[j].nameP, CV, P[j].precio*CV);
+				cb[j] = P[j].cantidad;
+			}
+		}
+	printf("Total = %f\n", suma);
+}
+
+int Bienvenida(ESPECIFICACION *P, int n)
+{
+	int z = 0, x = 0, i;
+
+	printf("Bienvenid(@)\n");
+	do
+	{
+		printf("Que producto desea comprar: \n");
+		printf("Selecciona un Id  para escoger un producto\n");
+		printf("Si deseas hacer corte oprime 31\n");
+		printf("Id  Nombre\tPrecio\tCantidad\n");
+		for( i = 0; i < n; i++)
+		{
+			printf("%d   %s\t%2.2f\t%d\n", i+1, P[i].nameP, P[i].precio, P[i].cantidad);
+		}
+
+		scanf("%d", &z);
+		if(z == 31)
+			x = 31;
+		else
+		{
+			if (P[z-1].cantidad < 1)
+				printf("\nLo sentimos el producto esta agotado, selecciona otro\n\n");
+			else
+				x = 1;
+		}
+	}while(x == 0);
+
+	//Retornamos z porque es el ID del producto que el usuario selecciono.
+	return z-1;
+}
